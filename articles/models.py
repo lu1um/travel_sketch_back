@@ -7,9 +7,15 @@ from imagekit.processors import Thumbnail
 class Tag(models.Model):
     name = models.CharField(max_length=100)
 
+    def __str__(self):
+        return self.name
+
 
 class Region(models.Model):
     name = models.CharField(max_length=100)
+
+    def __str__(self):
+        return self.name
 
 
 class Article(models.Model):
