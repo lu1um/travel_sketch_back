@@ -36,7 +36,7 @@ class ArticleSerializer(serializers.ModelSerializer):
             fields = '__all__'
 
     user = UserSerializer(read_only=True)
-    like_users = UserSerializer(read_only=True)
+    like_users = UserSerializer(read_only=True, many=True)
     region = RegionSerializer(many=True)
     tag = TagSerializer(many=True)
     comments = CommentSerializer(many=True, read_only=True)

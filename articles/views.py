@@ -2,6 +2,7 @@ from rest_framework import status
 from rest_framework.decorators import api_view
 from rest_framework.response import Response
 from django.shortcuts import get_object_or_404
+from django.db.models import Q
 
 from .models import Article, Comment, News
 from .serializers import ArticleSerializer, CommentSerializer, NewsSerializer
@@ -94,7 +95,19 @@ def comment_update_or_delete(request, article_pk, comment_pk):
 
 @api_view(['GET'])
 def search(request):
-    keywords = request.data.keyword.split()
+    keywords = request.data['keyword'].split()
+    result = {'article': [], 'news': []}
+    for keyword in keywords:
+        if len(keyword) > 1:
+            result['article'].extend(ArticleSerializer(Article.objects.filter(\
+                Q (title__icontains=keyword) | Q (content__icontains=keyword) | Q (tag__name=keyword) | Q (region__name=keyword))\
+                , many=True).data)
+            result['news'].extend(NewsSerializer(News.objects.filter(\
+                Q (title__icontains=keyword) | Q (description__icontains=keyword) | Q (region__name=keyword)) \
+                , many=True).data)
+        else:
+            return Response({'error': '검색어를 2글자 이상 입력해주세요.'}, status=status.HTTP_406_NOT_ACCEPTABLE)
+    return Response(result)
 
 
 @api_view(['GET', 'POST'])
